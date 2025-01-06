@@ -8,16 +8,20 @@
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
     </style>
     <script>
-        function getSeedwave() {
-            const seedwave = Math.floor(Math.random() * 10) + 1; // Seedwave 1-10
-            const duration = Math.floor(Math.random() * 60) + 1; // 1-60 minutes
-            return { seedwave, duration };
+        async function fetchSeedwave() {
+            try {
+                const response = await fetch('/api/seedwave'); // Fetch data from the serverless function
+                const data = await response.json();
+                document.getElementById("wave").textContent = `Seedwave: ${data.seedwave}`;
+                document.getElementById("duration").textContent = `Time remaining: ${data.duration} seconds`;
+            } catch (error) {
+                console.error("Failed to fetch seedwave:", error);
+                document.getElementById("wave").textContent = `Error fetching seedwave`;
+                document.getElementById("duration").textContent = ``;
+            }
         }
-        document.addEventListener("DOMContentLoaded", () => {
-            const { seedwave, duration } = getSeedwave();
-            document.getElementById("wave").textContent = `Seedwave: ${seedwave}`;
-            document.getElementById("duration").textContent = `Duration: ${duration} minutes`;
-        });
+
+        document.addEventListener("DOMContentLoaded", fetchSeedwave);
     </script>
 </head>
 <body>
