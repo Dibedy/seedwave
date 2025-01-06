@@ -23,9 +23,15 @@
                 const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
+                // Get timezone abbreviation
+                const timezoneName = endTime
+                    .toLocaleTimeString('en-US', { timeZoneName: 'short' })
+                    .split(' ')
+                    .pop();
+
                 // Display the seedwave details
                 document.getElementById("wave").textContent = `Seedwave: ${data.seedwave}`;
-                document.getElementById("duration").textContent = `Ends in ${hours}hr ${minutes}min ${seconds}sec - ${endTime.toLocaleTimeString()}`;
+                document.getElementById("duration").textContent = `Ends in ${hours}hr ${minutes}min ${seconds}sec - ${endTime.toLocaleTimeString()} (${timezoneName})`;
             } catch (error) {
                 console.error("Failed to fetch seedwave:", error);
                 document.getElementById("wave").textContent = `Error fetching seedwave`;
