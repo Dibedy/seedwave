@@ -96,11 +96,15 @@
             }
 
             function formatTime(timestamp) {
-                const date = new Date(timestamp);
-                const options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
-                const timeString = date.toLocaleTimeString('en-US', options);
-                return timeString.replace(" am", " AM").replace(" pm", " PM");
+            const date = new Date(timestamp);
+            const hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            const period = hours < 12 ? 'AM' : 'PM';
+            const formattedHours = hours % 12 === 0 ? 12 : hours % 12; // Converts 0 or 12 to 12 for AM/PM
+            return `${formattedHours}:${minutes}:${seconds} ${period}`;
             }
+
 
             async function updateSeedwave() {
                 const data = await fetchSeedwaveData();
