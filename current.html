@@ -5,46 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current Seedwave</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    </style>
-    <script>
-        async function fetchSeedwave() {
-            try {
-                const response = await fetch('/api/seedwave'); // Fetch data from the serverless function
-                const data = await response.json();
-
-                // Calculate the remaining time and local end time
-                const now = Date.now();
-                const remainingTime = Math.max(0, data.expiresAt - now);
-                const endTime = new Date(data.expiresAt);
-
-                // Format remaining time
-                const hours = Math.floor(remainingTime / (1000 * 60 * 60));
-                const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-
-                // Get timezone abbreviation
-                const timezoneName = endTime
-                    .toLocaleTimeString('en-US', { timeZoneName: 'short' })
-                    .split(' ')
-                    .pop();
-
-                // Display the seedwave details
-                document.getElementById("wave").textContent = `Seedwave: ${data.seedwave}`;
-                document.getElementById("duration").textContent = `Ends in ${hours}hr ${minutes}min ${seconds}sec - ${endTime.toLocaleTimeString()} (${timezoneName})`;
-            } catch (error) {
-                console.error("Failed to fetch seedwave:", error);
-                document.getElementById("wave").textContent = `Error fetching seedwave`;
-                document.getElementById("duration").textContent = ``;
-            }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
         }
-
-        document.addEventListener("DOMContentLoaded", fetchSeedwave);
-    </script>
+        h1 {
+            font-size: 2.5rem;
+            color: #a78bfa;
+        }
+        p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        .spacer {
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 1rem;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <h1>Current Seedwave</h1>
-    <p id="wave">Loading...</p>
-    <p id="duration">Loading...</p>
+    <div class="spacer"></div>
+
+    <p id="seedwave-level">Seedwave Level: X</p>
+    <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
+    <p id="next-seedwave">Next Seedwave: XX:XX (XXX)</p>
+    <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX XXX)</p>
+
+    <div class="spacer"></div>
+    <a href="index.html" class="button">Back to Main Page</a>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                // Fetch seedwave data from your API
+                const response = await fetch('/api/seedwave'); // Adjust endpoint if necessary
+                const data = await response.json();
+
+                // Update the placeholders with dynamic data
+                document.getElementById("seedwave-level").textContent = `Seedwave Level: ${data.seedwave}`;
+                document.getElementById("ends-in").textContent = `Ends in: ${formatRemainingTime(data.expiresAt)}`;
+                document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatNextSeedwave(data.expiresAt)}`;
+                document.getElementById("previous-seedwave").textContent = `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt)})`;
+            } catch (error) {
+                console.error("Failed to fetch seedwave data:", error);
+            }
+        });
+
+        function formatRemainingTime(expiresAt) {
+            const now = Date.now();
+            const remaining = Math.max(0, expiresAt - now);
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            return `${hours}hr(s) ${minutes}min(s) ${seconds}sec(s)`;
+        }
+
+        function formatNextSeedwave(expiresAt) {
+            const nextStart = new Date(expiresAt + 60 * 1000); // Add 1 minute for simplicity
+            return nextStart.toLocaleTimeString('en-US', { timeZoneName: 'short' });
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('en-US', { timeZoneName: 'short' });
+        }
+    </script>
 </body>
 </html>
