@@ -65,8 +65,8 @@
     <div id="content" style="display: none;">
         <p id="seedwave-level">Seedwave Level: X</p>
         <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
-        <p id="next-seedwave">Next Seedwave: XX:XX:XX a.m./p.m.</p>
-        <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX a.m./p.m.)</p>
+        <p id="next-seedwave">Next Seedwave: XX:XX:XX AM/PM</p>
+        <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX AM/PM)</p>
     </div>
 
     <div class="spacer"></div>
@@ -77,54 +77,71 @@
             const loader = document.getElementById("loader");
             const content = document.getElementById("content");
 
-            try {
-                // Fetch seedwave data from your API
-                const response = await fetch('/api/seedwave');
-                const data = await response.json();
+            async function fetchSeedwaveData() {
+                try {
+                    const response = await fetch('/api/seedwave');
+                    return await response.json();
+                } catch (error) {
+                    console.error("Failed to fetch seedwave data:", error);
+                    return null;
+                }
+            }
 
-                // Update static data
-                document.getElementById("seedwave-level").textContent = `Seedwave Level: ${data.seedwave}`;
-                document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatTime(data.expiresAt)}`;
+            function formatRemainingTime(milliseconds) {
+                const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                return `${hours}hr(s) ${minutes}min(s) ${seconds}sec(s)`;
+            }
+
+            function formatTime(timestamp) {
+                const date = new Date(timestamp);
+                const options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+                const timeString = date.toLocaleTimeString('en-US', options);
+                return timeString.replace(" am", " AM").replace(" pm", " PM");
+            }
+
+            async function updateSeedwave() {
+                const data = await fetchSeedwaveData();
+                if (data) {
+                    document.getElementById("seedwave-level").textContent = `Seedwave Level: ${data.seedwave}`;
+                    document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatTime(data.expiresAt)}`;
+                    document.getElementById("previous-seedwave").textContent =
+                        `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt)})`;
+                    startCountdown(data.expiresAt);
+                }
+            }
+
+            function startCountdown(expiresAt) {
+                const countdownElement = document.getElementById("ends-in");
+
+                function updateCountdown() {
+                    const remaining = expiresAt - Date.now();
+                    if (remaining <= 0) {
+                        updateSeedwave(); // Fetch new seedwave data when the timer hits 0
+                    } else {
+                        countdownElement.textContent = `Ends in: ${formatRemainingTime(remaining)}`;
+                    }
+                }
+
+                updateCountdown(); // Initial call
+                setInterval(updateCountdown, 1000);
+            }
+
+            const initialData = await fetchSeedwaveData();
+            if (initialData) {
+                document.getElementById("seedwave-level").textContent = `Seedwave Level: ${initialData.seedwave}`;
+                document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatTime(initialData.expiresAt)}`;
                 document.getElementById("previous-seedwave").textContent =
-                    `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt)})`;
+                    `Previous Seedwave: Level ${initialData.previousSeedwave.level} (Ended at ${formatTime(initialData.previousSeedwave.endedAt)})`;
 
-                // Hide loader and show content
                 loader.style.display = 'none';
                 content.style.display = 'block';
 
-                // Start real-time countdown
-                startCountdown(data.expiresAt);
-            } catch (error) {
-                console.error("Failed to fetch seedwave data:", error);
+                startCountdown(initialData.expiresAt);
             }
         });
-
-        function formatRemainingTime(milliseconds) {
-            const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            return `${hours}hr(s) ${minutes}min(s) ${seconds}sec(s)`;
-        }
-
-        function formatTime(timestamp) {
-            const date = new Date(timestamp);
-            const options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
-            const timeString = date.toLocaleTimeString('en-US', options);
-            return timeString.toLowerCase().replace(" am", " a.m.").replace(" pm", " p.m.");
-        }
-
-        function startCountdown(expiresAt) {
-            const countdownElement = document.getElementById("ends-in");
-
-            function updateCountdown() {
-                const remaining = expiresAt - Date.now();
-                countdownElement.textContent = `Ends in: ${formatRemainingTime(remaining)}`;
-            }
-
-            updateCountdown(); // Initial call
-            setInterval(updateCountdown, 1000);
-        }
     </script>
 
 </body>
