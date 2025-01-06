@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Seedwave</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    </style>
+    <script>
+        function getSeedwave() {
+            const seedwave = Math.floor(Math.random() * 10) + 1; // Seedwave 1-10
+            const duration = Math.floor(Math.random() * 60) + 1; // 1-60 minutes
+            return { seedwave, duration };
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            const { seedwave, duration } = getSeedwave();
+            document.getElementById("wave").textContent = `Seedwave: ${seedwave}`;
+            document.getElementById("duration").textContent = `Duration: ${duration} minutes`;
+        });
+    </script>
+</head>
+<body>
+    <h1>Current Seedwave</h1>
+    <p id="wave">Loading...</p>
+    <p id="duration">Loading...</p>
+</body>
+</html>
