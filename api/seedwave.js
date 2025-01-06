@@ -10,9 +10,8 @@ export default function handler(req, res) {
         seedwaveExpires = now + Math.floor(Math.random() * 60 + 1) * 60 * 1000;
     }
 
-    const timeRemaining = Math.max(0, Math.floor((seedwaveExpires - now) / 1000)); // Seconds remaining
     res.status(200).json({
         seedwave: currentSeedwave,
-        duration: timeRemaining, // Remaining time in seconds
+        expiresAt: seedwaveExpires, // Send absolute expiration timestamp in UTC
     });
 }

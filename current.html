@@ -12,8 +12,20 @@
             try {
                 const response = await fetch('/api/seedwave'); // Fetch data from the serverless function
                 const data = await response.json();
+
+                // Calculate the remaining time and local end time
+                const now = Date.now();
+                const remainingTime = Math.max(0, data.expiresAt - now);
+                const endTime = new Date(data.expiresAt);
+
+                // Format remaining time
+                const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+                const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+                // Display the seedwave details
                 document.getElementById("wave").textContent = `Seedwave: ${data.seedwave}`;
-                document.getElementById("duration").textContent = `Time remaining: ${data.duration} seconds`;
+                document.getElementById("duration").textContent = `Ends in ${hours}hr ${minutes}min ${seconds}sec - ${endTime.toLocaleTimeString()}`;
             } catch (error) {
                 console.error("Failed to fetch seedwave:", error);
                 document.getElementById("wave").textContent = `Error fetching seedwave`;
