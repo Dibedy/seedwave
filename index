@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seedwave</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        a { text-decoration: none; color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Seedwave</h1>
+    <p>A seedwave is a magical time when Minecraft RSG seeds are better than usual!</p>
+    <p>Click below to see the current seedwave:</p>
+    <a href="current.html">Check Current Seedwave</a>
+</body>
+</html>
