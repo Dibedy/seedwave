@@ -1,33 +1,56 @@
-// Track the current and last seedwave
+// Function to generate a seedwave level with gradual weighted distribution
+function getWeightedSeedwaveLevel() {
+    const weights = [
+        5,   // Level 1
+        10,  // Level 2
+        20,  // Level 3
+        25,  // Level 4
+        20,  // Level 5
+        15,  // Level 6
+        5,   // Level 7
+        5,   // Level 8
+        3,   // Level 9
+        2,   // Level 10
+    ];
+
+    // Create cumulative weights
+    const cumulativeWeights = weights.map((sum => value => sum += value)(0));
+    const random = Math.random() * 100;
+
+    // Determine the level based on cumulative weights
+    for (let i = 0; i < cumulativeWeights.length; i++) {
+        if (random < cumulativeWeights[i]) return i + 1;
+    }
+}
+
+// Generate the seedwave level
 let currentSeedwave = {
-    level: Math.floor(Math.random() * 10) + 1, // Initial seedwave (1-10)
-    expiresAt: Date.now() + Math.floor(Math.random() * 60 + 1) * 60 * 1000, // Expiration in 1-60 minutes
+    level: getWeightedSeedwaveLevel(),
+    expiresAt: Date.now() + Math.floor(Math.random() * 60 + 1) * 60 * 1000,
 };
 
-let lastSeedwave = null; // Store the last seedwave details
+let lastSeedwave = null;
 
+// API handler
 export default function handler(req, res) {
     const now = Date.now();
 
     // If the seedwave has expired, generate a new one
     if (now > currentSeedwave.expiresAt) {
-        // Move the current seedwave to the lastSeedwave
         lastSeedwave = {
             level: currentSeedwave.level,
             endedAt: currentSeedwave.expiresAt,
         };
 
-        // Generate a new seedwave
         currentSeedwave = {
-            level: Math.floor(Math.random() * 10) + 1,
+            level: getWeightedSeedwaveLevel(),
             expiresAt: now + Math.floor(Math.random() * 60 + 1) * 60 * 1000,
         };
     }
 
-    // Respond with both current and last seedwave data
     res.status(200).json({
         seedwave: currentSeedwave.level,
-        expiresAt: currentSeedwave.expiresAt, // Current seedwave expiration
-        previousSeedwave: lastSeedwave || { level: 'N/A', endedAt: 'N/A' }, // Last seedwave details
+        expiresAt: currentSeedwave.expiresAt,
+        previousSeedwave: lastSeedwave || { level: 'N/A', endedAt: 'N/A' },
     });
 }
