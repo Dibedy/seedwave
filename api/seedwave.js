@@ -23,10 +23,17 @@ function getWeightedSeedwaveLevel() {
     }
 }
 
+// Function to generate a random duration between 30 minutes and 4 hours (in milliseconds)
+function getRandomDuration() {
+    const min = 1 * 60 * 1000; // 20 minutes in milliseconds
+    const max = 2 * 60 * 1000; // 4 hours in milliseconds
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // Generate the seedwave level
 let currentSeedwave = {
     level: getWeightedSeedwaveLevel(),
-    expiresAt: Date.now() + Math.floor(Math.random() * 60 + 1) * 60 * 1000,
+    expiresAt: Date.now() + getRandomDuration(),
 };
 
 let lastSeedwave = null;
@@ -44,7 +51,7 @@ export default function handler(req, res) {
 
         currentSeedwave = {
             level: getWeightedSeedwaveLevel(),
-            expiresAt: now + Math.floor(Math.random() * 60 + 1) * 60 * 1000,
+            expiresAt: now + getRandomDuration(),
         };
     }
 
