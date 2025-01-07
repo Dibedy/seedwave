@@ -8,36 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current Seedwave</title>
     <style>
-        .top-left-icons {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            cursor: pointer;
-        }
-
-        .icon:hover {
-            transform: scale(1.1);
-            opacity: 0.8;
-        }
-
-        .made-by {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #ffffff;
-            font-family: 'Lexend', sans-serif;
-        }
-
+        /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -80,8 +51,9 @@
             font-weight: bold;
         }
 
-        #seedwave-number {
+        #seedwave-text {
             font-weight: bold;
+            color: #ffffff;
         }
 
         .button {
@@ -103,6 +75,7 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
 
+        /* Loader */
         #loader {
             border: 8px solid #f3f3f3;
             border-top: 8px solid #3498db;
@@ -120,34 +93,19 @@
     </style>
 </head>
 <body>
-    <!-- Top Left Icons -->
-    <div class="top-left-icons">
-        <p class="made-by">Made by Dibedy</p>
-        <a href="https://www.youtube.com/@Dibedyy" target="_blank">
-            <img src="https://seedwave.vercel.app/dibedy_icon.jpg" alt="Dibedy YouTube" class="icon">
-        </a>
-        <a href="https://www.youtube.com/@MinecraftSpeedrunningWiki" target="_blank">
-            <img src="https://seedwave.vercel.app/wiki_icon.jpg" alt="MCSR Wiki YouTube" class="icon">
-        </a>
-        <a href="https://github.com/Dibedy/The-MCSR-Practice-Map" target="_blank">
-            <img src="https://seedwave.vercel.app/wiki_icon.jpg" alt="MCSR Practice Map" class="icon">
-        </a>
-    </div>
-
     <!-- Main Section -->
     <div class="container">
         <h1>Current Seedwave</h1>
         <div id="loader"></div>
         <div id="content" style="display: none;">
             <p id="seedwave-level">
-                <span id="seedwave-text">Seedwave Level:</span>
-                <span id="seedwave-number" style="color: #00FF00;"></span>
+                <span id="seedwave-text">Seedwave:</span>
+                <span id="seedwave-number" style="color: #00FF00;">X</span>
             </p>
-            <p id="ends-in"></p>
-            <p id="next-seedwave"></p>
-            <p id="previous-seedwave"></p>
+            <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
+            <p id="next-seedwave">Next Seedwave: XX:XX:XX AM/PM GMT+X</p>
+            <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX AM/PM GMT+X)</p>
         </div>
-        <!-- Back Button -->
         <a href="index.html" class="button">Back to Main Page</a>
     </div>
 
@@ -155,6 +113,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             const loader = document.getElementById("loader");
             const content = document.getElementById("content");
+            const seedwaveTextElement = document.getElementById("seedwave-text");
             const seedwaveNumberElement = document.getElementById("seedwave-number");
 
             async function fetchSeedwaveData() {
@@ -196,27 +155,48 @@
             async function updateSeedwave() {
                 const data = await fetchSeedwaveData();
                 if (data) {
-                    document.getElementById("seedwave-number").textContent = ` ${data.seedwave}`;
-                    document.getElementById("seedwave-number").style.color = getLevelColor(data.seedwave);
-                    document.getElementById("ends-in").textContent = 
-                        `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                    document.getElementById("next-seedwave").textContent =
+                    seedwaveTextElement.textContent = "Seedwave Level:";
+                    seedwaveNumberElement.textContent = ` ${data.seedwave}`;
+                    seedwaveNumberElement.style.color = getLevelColor(data.seedwave);
+                    document.getElementById("next-seedwave").textContent = 
                         `Next Seedwave: ${formatTimeWithTimezone(data.expiresAt)}`;
                     document.getElementById("previous-seedwave").textContent =
                         `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTimeWithTimezone(data.previousSeedwave.endedAt)})`;
+                    startCountdown(data.expiresAt);
                 }
+            }
+
+            function startCountdown(expiresAt) {
+                const countdownElement = document.getElementById("ends-in");
+
+                function updateCountdown() {
+                    const remaining = expiresAt - Date.now();
+                    if (remaining <= 0) {
+                        updateSeedwave();
+                    } else {
+                        countdownElement.textContent = `Ends in: ${formatRemainingTime(remaining)}`;
+                    }
+                }
+
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
             }
 
             const initialData = await fetchSeedwaveData();
             if (initialData) {
-                updateSeedwave();
+                seedwaveTextElement.textContent = "Seedwave Level:";
+                seedwaveNumberElement.textContent = ` ${initialData.seedwave}`;
+                seedwaveNumberElement.style.color = getLevelColor(initialData.seedwave);
+                document.getElementById("next-seedwave").textContent = 
+                    `Next Seedwave: ${formatTimeWithTimezone(initialData.expiresAt)}`;
+                document.getElementById("previous-seedwave").textContent =
+                    `Previous Seedwave: Level ${initialData.previousSeedwave.level} (Ended at ${formatTimeWithTimezone(initialData.previousSeedwave.endedAt)})`;
+
                 loader.style.display = 'none';
                 content.style.display = 'block';
-            } else {
-                loader.textContent = "Failed to load data.";
-            }
 
-            setInterval(updateSeedwave, 1000);
+                startCountdown(initialData.expiresAt);
+            }
         });
     </script>
 </body>
