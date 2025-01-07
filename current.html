@@ -39,6 +39,10 @@
             font-size: 1.2rem;
             margin: 10px 0;
         }
+        #seedwave-level {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
         .spacer {
             margin: 20px 0;
         }
@@ -63,7 +67,7 @@
 
     <div id="loader"></div>
     <div id="content" style="display: none;">
-        <p id="seedwave-level">Seedwave Level: X</p>
+        <p id="seedwave-level" style="color: #00FF00;">Seedwave Level: X</p>
         <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
         <p id="next-seedwave">Next Seedwave: XX:XX:XX AM/PM</p>
         <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX AM/PM)</p>
@@ -76,6 +80,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             const loader = document.getElementById("loader");
             const content = document.getElementById("content");
+            const seedwaveLevelElement = document.getElementById("seedwave-level");
 
             async function fetchSeedwaveData() {
                 try {
@@ -96,20 +101,25 @@
             }
 
             function formatTime(timestamp) {
-            const date = new Date(timestamp);
-            const hours = date.getHours();
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
-            const period = hours < 12 ? 'AM' : 'PM';
-            const formattedHours = hours % 12 === 0 ? 12 : hours % 12; // Converts 0 or 12 to 12 for AM/PM
-            return `${formattedHours}:${minutes}:${seconds} ${period}`;
+                const date = new Date(timestamp);
+                const options = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+                const timeString = date.toLocaleTimeString('en-US', options);
+                return timeString.replace(" am", " AM").replace(" pm", " PM");
             }
 
+            function getLevelColor(level) {
+                if (level <= 3) return "#00FF00"; // Green
+                if (level <= 6) return "#FFFF00"; // Yellow
+                if (level <= 8) return "#FFA500"; // Orange
+                if (level === 9) return "#FF0000"; // Red
+                return "#800080"; // Dark Purple
+            }
 
             async function updateSeedwave() {
                 const data = await fetchSeedwaveData();
                 if (data) {
-                    document.getElementById("seedwave-level").textContent = `Seedwave Level: ${data.seedwave}`;
+                    seedwaveLevelElement.textContent = `Seedwave Level: ${data.seedwave}`;
+                    seedwaveLevelElement.style.color = getLevelColor(data.seedwave);
                     document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatTime(data.expiresAt)}`;
                     document.getElementById("previous-seedwave").textContent =
                         `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt)})`;
@@ -135,7 +145,8 @@
 
             const initialData = await fetchSeedwaveData();
             if (initialData) {
-                document.getElementById("seedwave-level").textContent = `Seedwave Level: ${initialData.seedwave}`;
+                seedwaveLevelElement.textContent = `Seedwave Level: ${initialData.seedwave}`;
+                seedwaveLevelElement.style.color = getLevelColor(initialData.seedwave);
                 document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatTime(initialData.expiresAt)}`;
                 document.getElementById("previous-seedwave").textContent =
                     `Previous Seedwave: Level ${initialData.previousSeedwave.level} (Ended at ${formatTime(initialData.previousSeedwave.endedAt)})`;
