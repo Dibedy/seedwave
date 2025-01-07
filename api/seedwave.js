@@ -23,9 +23,9 @@ function getWeightedSeedwaveLevel() {
     }
 }
 
-// Function to generate a random duration between 30 minutes and 4 hours (in milliseconds)
+// Function to generate a random duration between 25 minutes and 4 hours (in milliseconds)
 function getRandomDuration() {
-    const min = 25 * 60 * 1000; // 30 minutes in milliseconds
+    const min = 25 * 60 * 1000; // 25 minutes in milliseconds
     const max = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
