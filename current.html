@@ -122,11 +122,11 @@
         <div id="content" style="display: none;">
             <p id="seedwave-level">
                 <span id="seedwave-text">Seedwave Level:</span>
-                <span id="seedwave-number" style="color: #00FF00;">X</span>
+                <span id="seedwave-number" style="color: #00FF00;"></span>
             </p>
-            <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
-            <p id="next-seedwave">Next Seedwave: XX:XX:XX AM/PM GMT+X</p>
-            <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX AM/PM GMT+X)</p>
+            <p id="ends-in"></p>
+            <p id="next-seedwave"></p>
+            <p id="previous-seedwave"></p>
         </div>
     </div>
 
@@ -188,9 +188,11 @@
 
             const initialData = await fetchSeedwaveData();
             if (initialData) {
+                updateSeedwave();
                 loader.style.display = 'none';
                 content.style.display = 'block';
-                updateSeedwave();
+            } else {
+                loader.textContent = "Failed to load data.";
             }
 
             setInterval(updateSeedwave, 1000);
@@ -198,4 +200,3 @@
     </script>
 </body>
 </html>
-F
