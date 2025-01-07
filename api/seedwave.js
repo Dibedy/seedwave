@@ -58,6 +58,17 @@ export default function handler(req, res) {
     // Fetch server-side timezone
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+    // Add CORS headers to the response
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle preflight OPTIONS request
+    if (req.method === 'OPTIONS') {
+        res.status(204).end();
+        return;
+    }
+
     res.status(200).json({
         seedwave: currentSeedwave.level,
         expiresAt: currentSeedwave.expiresAt,
