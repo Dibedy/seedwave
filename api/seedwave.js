@@ -55,9 +55,13 @@ export default function handler(req, res) {
         };
     }
 
+    // Add timezone to response
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     res.status(200).json({
         seedwave: currentSeedwave.level,
         expiresAt: currentSeedwave.expiresAt,
         previousSeedwave: lastSeedwave || { level: 'N/A', endedAt: 'N/A' },
+        timezone: userTimezone,
     });
 }
