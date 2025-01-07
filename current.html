@@ -8,6 +8,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current Seedwave</title>
     <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            overflow-y: scroll;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #a78bfa;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.5rem;
+            color: #b3b3b3;
+            margin: 10px 0;
+        }
+
+        #seedwave-level {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        #seedwave-text {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #ffffff;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Loader */
         #loader {
             border: 8px solid #f3f3f3;
             border-top: 8px solid #3498db;
@@ -22,63 +90,24 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
-        }
-        h1 {
-            font-size: 2.5rem;
-            color: #a78bfa;
-        }
-        p {
-            font-size: 1.2rem;
-            margin: 10px 0;
-        }
-        #seedwave-level {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        #seedwave-text {
-            font-weight: bold;
-            color: #ffffff;
-        }
-        .spacer {
-            margin: 20px 0;
-        }
-        .button {
-            display: inline-block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-            font-size: 1rem;
-        }
-        .button:hover {
-            background-color: #45a049;
-        }
     </style>
 </head>
 <body>
-    <h1>Current Seedwave</h1>
-    <div class="spacer"></div>
-
-    <div id="loader"></div>
-    <div id="content" style="display: none;">
-        <p id="seedwave-level"><span id="seedwave-text">Seedwave:</span> <span id="seedwave-number" style="color: #00FF00;">X</span></p>
-        <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
-        <p id="next-seedwave">Next Seedwave: XX:XX:XX AM/PM GMT+X</p>
-        <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX AM/PM GMT+X)</p>
+    <!-- Main Section -->
+    <div class="container">
+        <h1>Current Seedwave</h1>
+        <div id="loader"></div>
+        <div id="content" style="display: none;">
+            <p id="seedwave-level">
+                <span id="seedwave-text">Seedwave:</span>
+                <span id="seedwave-number" style="color: #00FF00;">X</span>
+            </p>
+            <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
+            <p id="next-seedwave">Next Seedwave: XX:XX:XX AM/PM GMT+X</p>
+            <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX AM/PM GMT+X)</p>
+        </div>
+        <a href="index.html" class="button">Back to Main Page</a>
     </div>
-
-    <div class="spacer"></div>
-    <a href="index.html" class="button">Back to Main Page</a>
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
@@ -110,10 +139,9 @@
                 const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
                 const timeString = date.toLocaleTimeString('en-US', options);
 
-                // Get timezone offset in hours
                 const offset = -date.getTimezoneOffset() / 60;
                 const timezone = `GMT${offset >= 0 ? '+' : ''}${offset}`;
-                return `${timeString.replace(' AM', ' AM').replace(' PM', ' PM')} ${timezone}`;
+                return `${timeString} ${timezone}`;
             }
 
             function getLevelColor(level) {
@@ -144,13 +172,13 @@
                 function updateCountdown() {
                     const remaining = expiresAt - Date.now();
                     if (remaining <= 0) {
-                        updateSeedwave(); // Fetch new seedwave data when the timer hits 0
+                        updateSeedwave();
                     } else {
                         countdownElement.textContent = `Ends in: ${formatRemainingTime(remaining)}`;
                     }
                 }
 
-                updateCountdown(); // Initial call
+                updateCountdown();
                 setInterval(updateCountdown, 1000);
             }
 
@@ -171,6 +199,5 @@
             }
         });
     </script>
-
 </body>
 </html>
