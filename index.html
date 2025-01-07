@@ -9,36 +9,38 @@
     <title>Seedwave</title>
     <style>
         /* Top-left icons container */
-.top-left-icons {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
+        .top-left-icons {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
 
-/* Icons styling */
-.icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
+        /* Icons styling */
+        .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            cursor: pointer;
+        }
 
-.icon:hover {
-    transform: scale(1.1);
-    opacity: 0.8;
-}
+        .icon:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
 
-/* "Made by Dibedy" text */
-.made-by {
-    margin-top: 5px;
-    font-size: 12px;
-    color: #ffffff;
-    font-family: 'Lexend', sans-serif;
-}
+        /* "Made by Dibedy" text */
+        .made-by {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #ffffff;
+            font-family: 'Lexend', sans-serif;
+        }
+
         /* General Reset */
         * {
             margin: 0;
@@ -173,23 +175,20 @@
     </style>
 </head>
 <body>
-        <div class="top-left-icons">
-            <a href="https://youtube.com/Dibedy" target="_blank">
-                <img src="https://seedwave.vercel.app/dibedy_icon.jpg
-                " alt="Dibedy YouTube" class="icon">
-            </a>
-            <a href="https://youtube.com/mcsrwiki" target="_blank">
-                <img src="https://seedwave.vercel.app/wiki_icon.jpg
-                " alt="MCSR Wiki YouTube" class="icon">
-            </a>
-            <a href="https://github.com/Dibedy/The-MCSR-Practice-Map" target="_blank">
-                <img src="https://seedwave.vercel.app/wiki_icon.jpg
-                " alt="MCSR Practice Map" class="icon">
-            </a>
-            <p class="made-by">Made by Dibedy</p>
-        </div>
-        <!-- Existing Content -->
-    
+    <!-- Top Left Icons -->
+    <div class="top-left-icons">
+        <a href="https://youtube.com/Dibedy" target="_blank">
+            <img src="https://seedwave.vercel.app/dibedy_icon.jpg" alt="Dibedy YouTube" class="icon">
+        </a>
+        <a href="https://youtube.com/mcsrwiki" target="_blank">
+            <img src="https://seedwave.vercel.app/wiki_icon.jpg" alt="MCSR Wiki YouTube" class="icon">
+        </a>
+        <a href="https://github.com/Dibedy/The-MCSR-Practice-Map" target="_blank">
+            <img src="https://seedwave.vercel.app/wiki_icon.jpg" alt="MCSR Practice Map" class="icon">
+        </a>
+        <p class="made-by">Made by Dibedy</p>
+    </div>
+
     <!-- Full-Screen Main Section -->
     <div class="main-section">
         <h1>Seedwave Tracker</h1>
