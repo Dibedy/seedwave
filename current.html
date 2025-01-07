@@ -155,7 +155,7 @@
             async function updateSeedwave() {
                 const data = await fetchSeedwaveData();
                 if (data) {
-                    seedwaveTextElement.textContent = "Seedwave:";
+                    seedwaveTextElement.textContent = "Seedwave Level:";
                     seedwaveNumberElement.textContent = ` ${data.seedwave}`;
                     seedwaveNumberElement.style.color = getLevelColor(data.seedwave);
                     document.getElementById("next-seedwave").textContent = 
