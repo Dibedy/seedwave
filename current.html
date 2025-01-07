@@ -43,6 +43,10 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
+        #seedwave-text {
+            font-weight: bold;
+            color: #ffffff;
+        }
         .spacer {
             margin: 20px 0;
         }
@@ -67,7 +71,7 @@
 
     <div id="loader"></div>
     <div id="content" style="display: none;">
-        <p id="seedwave-level" style="color: #00FF00;">Seedwave Level: X</p>
+        <p id="seedwave-level"><span id="seedwave-text">Seedwave:</span> <span id="seedwave-number" style="color: #00FF00;">X</span></p>
         <p id="ends-in">Ends in XXhr(s) XXmin(s) XXsec(s)</p>
         <p id="next-seedwave">Next Seedwave: XX:XX:XX AM/PM</p>
         <p id="previous-seedwave">Previous Seedwave: Level X (Ended at XX:XX:XX AM/PM)</p>
@@ -80,7 +84,8 @@
         document.addEventListener("DOMContentLoaded", async () => {
             const loader = document.getElementById("loader");
             const content = document.getElementById("content");
-            const seedwaveLevelElement = document.getElementById("seedwave-level");
+            const seedwaveTextElement = document.getElementById("seedwave-text");
+            const seedwaveNumberElement = document.getElementById("seedwave-number");
 
             async function fetchSeedwaveData() {
                 try {
@@ -118,8 +123,9 @@
             async function updateSeedwave() {
                 const data = await fetchSeedwaveData();
                 if (data) {
-                    seedwaveLevelElement.textContent = `Seedwave Level: ${data.seedwave}`;
-                    seedwaveLevelElement.style.color = getLevelColor(data.seedwave);
+                    seedwaveTextElement.textContent = "Seedwave:";
+                    seedwaveNumberElement.textContent = ` ${data.seedwave}`;
+                    seedwaveNumberElement.style.color = getLevelColor(data.seedwave);
                     document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatTime(data.expiresAt)}`;
                     document.getElementById("previous-seedwave").textContent =
                         `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt)})`;
@@ -145,8 +151,9 @@
 
             const initialData = await fetchSeedwaveData();
             if (initialData) {
-                seedwaveLevelElement.textContent = `Seedwave Level: ${initialData.seedwave}`;
-                seedwaveLevelElement.style.color = getLevelColor(initialData.seedwave);
+                seedwaveTextElement.textContent = "Seedwave:";
+                seedwaveNumberElement.textContent = ` ${initialData.seedwave}`;
+                seedwaveNumberElement.style.color = getLevelColor(initialData.seedwave);
                 document.getElementById("next-seedwave").textContent = `Next Seedwave: ${formatTime(initialData.expiresAt)}`;
                 document.getElementById("previous-seedwave").textContent =
                     `Previous Seedwave: Level ${initialData.previousSeedwave.level} (Ended at ${formatTime(initialData.previousSeedwave.endedAt)})`;
