@@ -1,61 +1,69 @@
+import { promises as fs } from 'fs';
+import path from 'path';
+
+// File to store seedwave state
+const dataFilePath = path.join(process.cwd(), 'seedwaveData.json');
+
 // Function to generate a seedwave level with gradual weighted distribution
 function getWeightedSeedwaveLevel() {
-    const weights = [
-        5,   // Level 1
-        10,  // Level 2
-        20,  // Level 3
-        25,  // Level 4
-        20,  // Level 5
-        15,  // Level 6
-        5,   // Level 7
-        5,   // Level 8
-        3,   // Level 9
-        2,   // Level 10
-    ];
-
+    const weights = [5, 10, 20, 25, 20, 15, 5, 5, 3, 2];
     const cumulativeWeights = weights.map((sum => value => sum += value)(0));
     const random = Math.random() * 100;
-
     for (let i = 0; i < cumulativeWeights.length; i++) {
         if (random < cumulativeWeights[i]) return i + 1;
     }
 }
 
-// Fixed seedwave duration (global synchronization)
-const SEEDWAVE_DURATION = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+// Function to generate a random duration between 25 minutes and 4 hours (in milliseconds)
+function getRandomDuration() {
+    const min = 25 * 60 * 1000; // 25 minutes
+    const max = 4 * 60 * 60 * 1000; // 4 hours
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-// Seedwave state
-let seedwaveState = {
-    level: getWeightedSeedwaveLevel(),
-    expiresAt: Date.now() + SEEDWAVE_DURATION,
-    startedAt: Date.now(),
-};
+async function getSeedwaveData() {
+    try {
+        const data = JSON.parse(await fs.readFile(dataFilePath, 'utf-8'));
+        const now = Date.now();
 
-// Function to reset the seedwave if expired
-function updateSeedwave() {
-    const now = Date.now();
-    if (now > seedwaveState.expiresAt) {
-        seedwaveState = {
-            level: getWeightedSeedwaveLevel(),
-            expiresAt: now + SEEDWAVE_DURATION,
-            startedAt: now,
+        if (now > data.currentSeedwave.expiresAt) {
+            // Update expired seedwave
+            data.previousSeedwave = {
+                level: data.currentSeedwave.level,
+                endedAt: data.currentSeedwave.expiresAt,
+            };
+            data.currentSeedwave = {
+                level: getWeightedSeedwaveLevel(),
+                expiresAt: now + getRandomDuration(),
+            };
+            await fs.writeFile(dataFilePath, JSON.stringify(data, null, 2), 'utf-8');
+        }
+
+        return data;
+    } catch (error) {
+        // Initialize seedwave data if file doesn't exist
+        const now = Date.now();
+        const initialData = {
+            currentSeedwave: {
+                level: getWeightedSeedwaveLevel(),
+                expiresAt: now + getRandomDuration(),
+            },
+            previousSeedwave: { level: 'N/A', endedAt: 'N/A' },
         };
+        await fs.writeFile(dataFilePath, JSON.stringify(initialData, null, 2), 'utf-8');
+        return initialData;
     }
 }
 
-// API handler
-export default function handler(req, res) {
-    // Ensure seedwave state is up-to-date
-    updateSeedwave();
-
-    // Fetch the user's timezone
+export default async function handler(req, res) {
+    const seedwaveData = await getSeedwaveData();
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200).json({
-        seedwave: seedwaveState.level,
-        startedAt: seedwaveState.startedAt,
-        expiresAt: seedwaveState.expiresAt,
+        seedwave: seedwaveData.currentSeedwave.level,
+        expiresAt: seedwaveData.currentSeedwave.expiresAt,
+        previousSeedwave: seedwaveData.previousSeedwave,
         timezone: userTimezone,
     });
 }
