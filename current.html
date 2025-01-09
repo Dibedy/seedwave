@@ -19,17 +19,20 @@
             font-family: 'Lexend', sans-serif;
             background-color: #121212;
             color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             text-align: center;
-            padding: 20px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
         }
 
         h1 {
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: 700;
             color: #a78bfa;
             margin-bottom: 20px;
@@ -46,10 +49,15 @@
             font-weight: bold;
         }
 
-        #seedwave-text {
+        #seedwave-number {
             font-weight: bold;
-            color: #ffffff;
         }
+
+        .green { color: #00FF00; }
+        .yellow { color: #FFFF00; }
+        .orange { color: #FFA500; }
+        .red { color: #FF0000; }
+        .purple { color: #800080; }
 
         .button {
             display: inline-block;
@@ -69,99 +77,75 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
-
-        #loader {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .green { color: #00FF00; }
-        .yellow { color: #FFFF00; }
-        .orange { color: #FFA500; }
-        .red { color: #FF0000; }
-        .purple { color: #800080; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Current Seedwave</h1>
-        <div id="loader"></div>
-        <div id="content" style="display: none;">
-            <p id="seedwave-level">
-                <span id="seedwave-text">Seedwave Level:</span>
-                <span id="seedwave-number">Loading...</span>
-            </p>
-            <p id="ends-in">Ends in: Loading...</p>
-            <p id="next-seedwave">Next Seedwave in: Loading...</p>
-            <p id="previous-seedwave">Previous Seedwave: Loading...</p>
-        </div>
+        <p id="seedwave-level">
+            Seedwave Level: 
+            <span id="seedwave-number" class="green">Loading...</span>
+        </p>
+        <p id="ends-in">Ends in: Loading...</p>
+        <p id="next-seedwave">Next Seedwave: Loading...</p>
+        <p id="previous-seedwave">Previous Seedwave: Loading...</p>
         <a href="index.html" class="button">Back to Main Page</a>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            const loader = document.getElementById("loader");
-            const content = document.getElementById("content");
-            const seedwaveTextElement = document.getElementById("seedwave-text");
-            const seedwaveNumberElement = document.getElementById("seedwave-number");
+        async function fetchSeedwaveData() {
+            try {
+                const response = await fetch('/api/seedwave');
+                const data = await response.json();
 
-            async function fetchSeedwaveData() {
-                try {
-                    const response = await fetch('/api/seedwave');
-                    const data = await response.json();
-
-                    // Update content with seedwave data
-                    seedwaveNumberElement.textContent = data.seedwave;
-                    seedwaveNumberElement.className = getLevelColorClass(data.seedwave);
-                    document.getElementById("ends-in").textContent = 
-                        `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                    document.getElementById("next-seedwave").textContent = 
-                        `Next Seedwave in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                    document.getElementById("previous-seedwave").textContent =
-                        `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt)})`;
-                } catch (error) {
-                    console.error("Failed to fetch seedwave data:", error);
+                // Update content with seedwave data
+                document.getElementById("seedwave-number").textContent = data.seedwave;
+                document.getElementById("seedwave-number").className = getLevelColorClass(data.seedwave);
+                document.getElementById("ends-in").textContent = 
+                    `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
+                document.getElementById("next-seedwave").textContent = 
+                    `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
+                if (data.previousSeedwave.level !== 'N/A') {
+                    document.getElementById("previous-seedwave").textContent = 
+                        `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
+                } else {
+                    document.getElementById("previous-seedwave").textContent = 
+                        "Previous Seedwave: N/A";
                 }
+            } catch (error) {
+                console.error("Failed to fetch seedwave data:", error);
             }
+        }
 
-            function formatRemainingTime(milliseconds) {
-                const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                return `${hours}hr(s) ${minutes}min(s) ${seconds}sec(s)`;
-            }
+        function formatRemainingTime(milliseconds) {
+            const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${hours}hr(s) ${minutes}min(s) ${seconds}sec(s)`;
+        }
 
-            function formatTime(timestamp) {
-                const date = new Date(timestamp);
-                return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-            }
+        function formatTime(timestamp, timezone) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: timezone,
+            });
+        }
 
-            function getLevelColorClass(level) {
-                if (level <= 3) return 'green';
-                if (level <= 6) return 'yellow';
-                if (level <= 8) return 'orange';
-                if (level === 9) return 'red';
-                return 'purple';
-            }
+        function getLevelColorClass(level) {
+            if (level <= 3) return 'green';
+            if (level <= 6) return 'yellow';
+            if (level <= 8) return 'orange';
+            if (level === 9) return 'red';
+            return 'purple';
+        }
 
-            // Fetch data initially and update every second
-            fetchSeedwaveData();
-            setInterval(fetchSeedwaveData, 1000);
-
-            loader.style.display = 'none';
-            content.style.display = 'block';
-        });
+        // Fetch data initially and update every second
+        fetchSeedwaveData();
+        setInterval(fetchSeedwaveData, 1000);
     </script>
 </body>
 </html>
