@@ -8,39 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seedwave</title>
     <style>
-        /* Top-left icons container */
-        .top-left-icons {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        /* Icons styling */
-        .icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            cursor: pointer;
-        }
-
-        .icon:hover {
-            transform: scale(1.1);
-            opacity: 0.8;
-        }
-
-        /* "Made by Dibedy" text */
-        .made-by {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #ffffff;
-            font-family: 'Lexend', sans-serif;
-        }
-
         /* General Reset */
         * {
             margin: 0;
@@ -143,6 +110,16 @@
             50% { opacity: 1; }
         }
 
+        /* Made by Dibedy */
+        .made-by {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 14px;
+            color: #ffffff;
+            font-family: 'Lexend', sans-serif;
+        }
+
         /* Explanation Section */
         .info-section {
             display: flex;
@@ -175,19 +152,8 @@
     </style>
 </head>
 <body>
-    <!-- Top Left Icons -->
-    <div class="top-left-icons">
-        <a href="https://www.youtube.com/@Dibedyy" target="_blank">
-            <img src="https://seedwave.vercel.app/dibedy_icon.jpg" alt="Dibedy YouTube" class="icon">
-        </a>
-        <a href="https://www.youtube.com/@MinecraftSpeedrunningWiki" target="_blank">
-            <img src="https://seedwave.vercel.app/wiki_icon.jpg" alt="MCSR Wiki YouTube" class="icon">
-        </a>
-        <a href="https://github.com/Dibedy/The-MCSR-Practice-Map" target="_blank">
-            <img src="https://seedwave.vercel.app/wiki_icon.jpg" alt="MCSR Practice Map" class="icon">
-        </a>
-        <p class="made-by">Made by Dibedy</p>
-    </div>
+    <!-- Made by Dibedy -->
+    <p class="made-by">Made by Dibedy</p>
 
     <!-- Full-Screen Main Section -->
     <div class="main-section">
