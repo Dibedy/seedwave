@@ -21,45 +21,41 @@ function getWeightedSeedwaveLevel() {
     }
 }
 
-// Function to generate a random duration between 25 minutes and 4 hours (in milliseconds)
-function getRandomDuration() {
-    const min = 25 * 60 * 1000; // 25 minutes
-    const max = 4 * 60 * 60 * 1000; // 4 hours
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+// Fixed seedwave duration (global synchronization)
+const SEEDWAVE_DURATION = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
-// Track seedwave state
-let currentSeedwave = {
+// Seedwave state
+let seedwaveState = {
     level: getWeightedSeedwaveLevel(),
-    expiresAt: Date.now() + getRandomDuration(),
+    expiresAt: Date.now() + SEEDWAVE_DURATION,
+    startedAt: Date.now(),
 };
 
-let lastSeedwave = null;
+// Function to reset the seedwave if expired
+function updateSeedwave() {
+    const now = Date.now();
+    if (now > seedwaveState.expiresAt) {
+        seedwaveState = {
+            level: getWeightedSeedwaveLevel(),
+            expiresAt: now + SEEDWAVE_DURATION,
+            startedAt: now,
+        };
+    }
+}
 
 // API handler
 export default function handler(req, res) {
-    const now = Date.now();
+    // Ensure seedwave state is up-to-date
+    updateSeedwave();
 
-    // Check if the current seedwave has expired
-    if (now > currentSeedwave.expiresAt) {
-        lastSeedwave = {
-            level: currentSeedwave.level,
-            endedAt: currentSeedwave.expiresAt,
-        };
-
-        currentSeedwave = {
-            level: getWeightedSeedwaveLevel(),
-            expiresAt: now + getRandomDuration(),
-        };
-    }
-
+    // Fetch the user's timezone
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200).json({
-        seedwave: currentSeedwave.level,
-        expiresAt: currentSeedwave.expiresAt,
-        previousSeedwave: lastSeedwave || { level: 'N/A', endedAt: 'N/A' },
+        seedwave: seedwaveState.level,
+        startedAt: seedwaveState.startedAt,
+        expiresAt: seedwaveState.expiresAt,
         timezone: userTimezone,
     });
 }

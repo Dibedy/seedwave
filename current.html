@@ -8,13 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current Seedwave</title>
     <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Lexend', sans-serif;
             background-color: #121212;
@@ -28,7 +21,6 @@
 
         .container {
             max-width: 600px;
-            margin: 0 auto;
         }
 
         h1 {
@@ -44,12 +36,8 @@
             margin: 10px 0;
         }
 
-        #seedwave-level {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
         #seedwave-number {
+            font-size: 2rem;
             font-weight: bold;
         }
 
@@ -83,13 +71,10 @@
     <div class="container">
         <h1>Current Seedwave</h1>
         <p id="seedwave-level">
-            Seedwave Level: 
-            <span id="seedwave-number" class="green">Loading...</span>
+            Seedwave Level: <span id="seedwave-number" class="green">Loading...</span>
         </p>
         <p id="ends-in">Ends in: Loading...</p>
         <p id="next-seedwave">Next Seedwave: Loading...</p>
-        <p id="previous-seedwave">Previous Seedwave: Loading...</p>
-        <a href="index.html" class="button">Back to Main Page</a>
     </div>
 
     <script>
@@ -98,20 +83,15 @@
                 const response = await fetch('/api/seedwave');
                 const data = await response.json();
 
+                const now = Date.now();
+
                 // Update content with seedwave data
                 document.getElementById("seedwave-number").textContent = data.seedwave;
                 document.getElementById("seedwave-number").className = getLevelColorClass(data.seedwave);
-                document.getElementById("ends-in").textContent = 
-                    `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                document.getElementById("next-seedwave").textContent = 
+                document.getElementById("ends-in").textContent =
+                    `Ends in: ${formatRemainingTime(data.expiresAt - now)}`;
+                document.getElementById("next-seedwave").textContent =
                     `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
-                if (data.previousSeedwave.level !== 'N/A') {
-                    document.getElementById("previous-seedwave").textContent = 
-                        `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
-                } else {
-                    document.getElementById("previous-seedwave").textContent = 
-                        "Previous Seedwave: N/A";
-                }
             } catch (error) {
                 console.error("Failed to fetch seedwave data:", error);
             }
