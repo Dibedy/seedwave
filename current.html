@@ -136,12 +136,13 @@
 
             function formatTimeWithTimezone(timestamp) {
                 const date = new Date(timestamp);
-                const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-                const timeString = date.toLocaleTimeString('en-US', options);
-
-                const offset = -date.getTimezoneOffset() / 60;
-                const timezone = `GMT${offset >= 0 ? '+' : ''}${offset}`;
-                return `${timeString} ${timezone}`;
+                return date.toLocaleTimeString('en-US', {
+                    timeZone: 'UTC',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                }) + " GMT";
             }
 
             function getLevelColor(level) {
@@ -158,10 +159,17 @@
                     seedwaveTextElement.textContent = "Seedwave Level:";
                     seedwaveNumberElement.textContent = ` ${data.seedwave}`;
                     seedwaveNumberElement.style.color = getLevelColor(data.seedwave);
+
                     document.getElementById("next-seedwave").textContent = 
                         `Next Seedwave: ${formatTimeWithTimezone(data.expiresAt)}`;
-                    document.getElementById("previous-seedwave").textContent =
-                        `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTimeWithTimezone(data.previousSeedwave.endedAt)})`;
+                    
+                    if (data.previousSeedwave && data.previousSeedwave.level !== null) {
+                        document.getElementById("previous-seedwave").textContent = 
+                            `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTimeWithTimezone(data.previousSeedwave.endedAt)})`;
+                    } else {
+                        document.getElementById("previous-seedwave").textContent = "No previous seedwave data available.";
+                    }
+
                     startCountdown(data.expiresAt);
                 }
             }
@@ -184,18 +192,9 @@
 
             const initialData = await fetchSeedwaveData();
             if (initialData) {
-                seedwaveTextElement.textContent = "Seedwave Level:";
-                seedwaveNumberElement.textContent = ` ${initialData.seedwave}`;
-                seedwaveNumberElement.style.color = getLevelColor(initialData.seedwave);
-                document.getElementById("next-seedwave").textContent = 
-                    `Next Seedwave: ${formatTimeWithTimezone(initialData.expiresAt)}`;
-                document.getElementById("previous-seedwave").textContent =
-                    `Previous Seedwave: Level ${initialData.previousSeedwave.level} (Ended at ${formatTimeWithTimezone(initialData.previousSeedwave.endedAt)})`;
-
                 loader.style.display = 'none';
                 content.style.display = 'block';
-
-                startCountdown(initialData.expiresAt);
+                updateSeedwave();
             }
         });
     </script>
