@@ -13,11 +13,9 @@ function getWeightedSeedwaveLevel() {
         2,   // Level 10
     ];
 
-    // Create cumulative weights
     const cumulativeWeights = weights.map((sum => value => sum += value)(0));
     const random = Math.random() * 100;
 
-    // Determine the level based on cumulative weights
     for (let i = 0; i < cumulativeWeights.length; i++) {
         if (random < cumulativeWeights[i]) return i + 1;
     }
@@ -25,12 +23,12 @@ function getWeightedSeedwaveLevel() {
 
 // Function to generate a random duration between 25 minutes and 4 hours (in milliseconds)
 function getRandomDuration() {
-    const min = 25 * 60 * 1000; // 25 minutes in milliseconds
-    const max = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+    const min = 25 * 60 * 1000; // 25 minutes
+    const max = 4 * 60 * 60 * 1000; // 4 hours
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Generate the seedwave level
+// Track seedwave state
 let currentSeedwave = {
     level: getWeightedSeedwaveLevel(),
     expiresAt: Date.now() + getRandomDuration(),
@@ -42,7 +40,7 @@ let lastSeedwave = null;
 export default function handler(req, res) {
     const now = Date.now();
 
-    // If the seedwave has expired, generate a new one
+    // Check if the current seedwave has expired
     if (now > currentSeedwave.expiresAt) {
         lastSeedwave = {
             level: currentSeedwave.level,
@@ -55,24 +53,13 @@ export default function handler(req, res) {
         };
     }
 
-    // Fetch server-side timezone
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Add CORS headers to the response
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    // Handle preflight OPTIONS request
-    if (req.method === 'OPTIONS') {
-        res.status(204).end();
-        return;
-    }
-
     res.status(200).json({
         seedwave: currentSeedwave.level,
         expiresAt: currentSeedwave.expiresAt,
         previousSeedwave: lastSeedwave || { level: 'N/A', endedAt: 'N/A' },
-        timezone: userTimezone, // Added timezone to API response
+        timezone: userTimezone,
     });
 }
