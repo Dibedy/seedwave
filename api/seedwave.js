@@ -1,7 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-
-const SEEDWAVE_FILE = path.resolve('./seedwave.json');
+seedwave.js
 
 // Function to generate a seedwave level with gradual weighted distribution
 function getWeightedSeedwaveLevel() {
@@ -35,28 +32,13 @@ function getRandomDuration() {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Load seedwave data from file
-function loadSeedwave() {
-    try {
-        const data = JSON.parse(fs.readFileSync(SEEDWAVE_FILE, 'utf8'));
-        return data;
-    } catch (error) {
-        return {
-            currentSeedwave: {
-                level: getWeightedSeedwaveLevel(),
-                expiresAt: Date.now() + getRandomDuration(),
-            },
-            lastSeedwave: null,
-        };
-    }
-}
+// Generate the seedwave level
+let currentSeedwave = {
+    level: getWeightedSeedwaveLevel(),
+    expiresAt: Date.now() + getRandomDuration(),
+};
 
-// Save seedwave data to file
-function saveSeedwave(data) {
-    fs.writeFileSync(SEEDWAVE_FILE, JSON.stringify(data, null, 2), 'utf8');
-}
-
-let { currentSeedwave, lastSeedwave } = loadSeedwave();
+let lastSeedwave = null;
 
 // API handler
 export default function handler(req, res) {
@@ -73,9 +55,10 @@ export default function handler(req, res) {
             level: getWeightedSeedwaveLevel(),
             expiresAt: now + getRandomDuration(),
         };
-
-        saveSeedwave({ currentSeedwave, lastSeedwave });
     }
+
+    // Fetch server-side timezone
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     // Add CORS headers to the response
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -91,6 +74,7 @@ export default function handler(req, res) {
     res.status(200).json({
         seedwave: currentSeedwave.level,
         expiresAt: currentSeedwave.expiresAt,
-        previousSeedwave: lastSeedwave || null,
+        previousSeedwave: lastSeedwave || { level: 'N/A', endedAt: 'N/A' },
+        timezone: userTimezone, // Added timezone to API response
     });
 }
