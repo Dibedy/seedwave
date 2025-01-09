@@ -1,5 +1,3 @@
-seedwave.js
-
 // Function to generate a seedwave level with gradual weighted distribution
 function getWeightedSeedwaveLevel() {
     const weights = [
