@@ -8,6 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current Seedwave</title>
     <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Lexend', sans-serif;
             background-color: #121212;
@@ -17,11 +24,11 @@
             align-items: center;
             height: 100vh;
             text-align: center;
-            margin: 0;
         }
 
         .container {
             max-width: 600px;
+            margin: 0 auto;
         }
 
         h1 {
@@ -37,8 +44,12 @@
             margin: 10px 0;
         }
 
-        #seedwave-number {
+        #seedwave-level {
             font-size: 2rem;
+            font-weight: bold;
+        }
+
+        #seedwave-number {
             font-weight: bold;
         }
 
@@ -66,66 +77,41 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
-
-        #loader {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        #content {
-            display: none;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Current Seedwave</h1>
-        <div id="loader"></div> <!-- Loader -->
-        <div id="content">
-            <p id="seedwave-level">
-                Seedwave Level: <span id="seedwave-number">Loading...</span>
-            </p>
-            <p id="ends-in">Ends in: Loading...</p>
-            <p id="next-seedwave">Next Seedwave: Loading...</p>
-            <p id="previous-seedwave">Previous Seedwave: Loading...</p>
-            <a href="index.html" class="button">Back to Main Page</a>
-        </div>
+        <p id="seedwave-level">
+            Seedwave Level: 
+            <span id="seedwave-number" class="green">Loading...</span>
+        </p>
+        <p id="ends-in">Ends in: Loading...</p>
+        <p id="next-seedwave">Next Seedwave: Loading...</p>
+        <p id="previous-seedwave">Previous Seedwave: Loading...</p>
+        <a href="index.html" class="button">Back to Main Page</a>
     </div>
 
     <script>
         async function fetchSeedwaveData() {
-            const loader = document.getElementById("loader");
-            const content = document.getElementById("content");
-
             try {
                 const response = await fetch('/api/seedwave');
                 const data = await response.json();
 
-                const now = Date.now();
-
                 // Update content with seedwave data
                 document.getElementById("seedwave-number").textContent = data.seedwave;
                 document.getElementById("seedwave-number").className = getLevelColorClass(data.seedwave);
-                document.getElementById("ends-in").textContent =
-                    `Ends in: ${formatRemainingTime(data.expiresAt - now)}`;
-                document.getElementById("next-seedwave").textContent =
+                document.getElementById("ends-in").textContent = 
+                    `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
+                document.getElementById("next-seedwave").textContent = 
                     `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
-                document.getElementById("previous-seedwave").textContent =
-                    `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
-
-                // Hide loader and show content
-                loader.style.display = 'none';
-                content.style.display = 'block';
+                if (data.previousSeedwave.level !== 'N/A') {
+                    document.getElementById("previous-seedwave").textContent = 
+                        `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
+                } else {
+                    document.getElementById("previous-seedwave").textContent = 
+                        "Previous Seedwave: N/A";
+                }
             } catch (error) {
                 console.error("Failed to fetch seedwave data:", error);
             }
