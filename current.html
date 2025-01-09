@@ -8,6 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current Seedwave</title>
     <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Lexend', sans-serif;
             background-color: #121212;
@@ -65,16 +72,36 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
+
+        #loader {
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #a78bfa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Current Seedwave</h1>
-        <p id="seedwave-level">
-            Seedwave Level: <span id="seedwave-number" class="green">Loading...</span>
-        </p>
-        <p id="ends-in">Ends in: Loading...</p>
-        <p id="next-seedwave">Next Seedwave: Loading...</p>
+        <div id="loader"></div>
+        <div id="content" style="display: none;">
+            <p id="seedwave-level">
+                Seedwave Level: <span id="seedwave-number" class="green">Loading...</span>
+            </p>
+            <p id="ends-in">Ends in: Loading...</p>
+            <p id="next-seedwave">Next Seedwave: Loading...</p>
+            <p id="previous-seedwave">Previous Seedwave: Loading...</p>
+        </div>
+        <a href="index.html" class="button">Back to Main Page</a>
     </div>
 
     <script>
@@ -92,6 +119,12 @@
                     `Ends in: ${formatRemainingTime(data.expiresAt - now)}`;
                 document.getElementById("next-seedwave").textContent =
                     `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
+                document.getElementById("previous-seedwave").textContent =
+                    `Previous Seedwave: Level ${data.previousSeedwave.level} (ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
+                
+                // Hide loader and display content
+                document.getElementById("loader").style.display = 'none';
+                document.getElementById("content").style.display = 'block';
             } catch (error) {
                 console.error("Failed to fetch seedwave data:", error);
             }
