@@ -108,8 +108,9 @@
         async function fetchSeedwaveData() {
             try {
                 const response = await fetch('/api/seedwave');
-                const data = await response.json();
+                if (!response.ok) throw new Error("Failed to fetch seedwave data");
 
+                const data = await response.json();
                 const now = Date.now();
 
                 // Update content with seedwave data
@@ -121,12 +122,14 @@
                     `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
                 document.getElementById("previous-seedwave").textContent =
                     `Previous Seedwave: Level ${data.previousSeedwave.level} (ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
-                
+
                 // Hide loader and display content
                 document.getElementById("loader").style.display = 'none';
                 document.getElementById("content").style.display = 'block';
             } catch (error) {
                 console.error("Failed to fetch seedwave data:", error);
+                document.getElementById("loader").style.display = 'none';
+                document.getElementById("content").innerHTML = `<p>Failed to load seedwave data. Please try again later.</p>`;
             }
         }
 
@@ -156,9 +159,8 @@
             return 'purple';
         }
 
-        // Fetch data initially and update every second
+        // Fetch data initially
         fetchSeedwaveData();
-        setInterval(fetchSeedwaveData, 1000);
     </script>
 </body>
 </html>
