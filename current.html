@@ -73,14 +73,15 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
 
+        /* Loading Circle */
         #loader {
-            margin: 20px auto;
-            width: 50px;
-            height: 50px;
             border: 8px solid #f3f3f3;
             border-top: 8px solid #a78bfa;
             border-radius: 50%;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
 
         @keyframes spin {
@@ -90,17 +91,18 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Current Seedwave</h1>
+    <div class="container" id="loading-container">
         <div id="loader"></div>
-        <div id="content" style="display: none;">
-            <p id="seedwave-level">
-                Seedwave Level: <span id="seedwave-number" class="green">Loading...</span>
-            </p>
-            <p id="ends-in">Ends in: Loading...</p>
-            <p id="next-seedwave">Next Seedwave: Loading...</p>
-            <p id="previous-seedwave">Previous Seedwave: Loading...</p>
-        </div>
+    </div>
+
+    <div class="container" id="content" style="display: none;">
+        <h1>Current Seedwave</h1>
+        <p id="seedwave-level">
+            Seedwave Level: <span id="seedwave-number">Loading...</span>
+        </p>
+        <p id="ends-in">Ends in: Loading...</p>
+        <p id="next-seedwave">Next Seedwave: Loading...</p>
+        <p id="previous-seedwave">Previous Seedwave: Loading...</p>
         <a href="index.html" class="button">Back to Main Page</a>
     </div>
 
@@ -108,9 +110,8 @@
         async function fetchSeedwaveData() {
             try {
                 const response = await fetch('/api/seedwave');
-                if (!response.ok) throw new Error("Failed to fetch seedwave data");
-
                 const data = await response.json();
+
                 const now = Date.now();
 
                 // Update content with seedwave data
@@ -121,15 +122,14 @@
                 document.getElementById("next-seedwave").textContent =
                     `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
                 document.getElementById("previous-seedwave").textContent =
-                    `Previous Seedwave: Level ${data.previousSeedwave.level} (ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
+                    `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
 
-                // Hide loader and display content
-                document.getElementById("loader").style.display = 'none';
+                // Hide loader and show content
+                document.getElementById("loading-container").style.display = 'none';
                 document.getElementById("content").style.display = 'block';
             } catch (error) {
                 console.error("Failed to fetch seedwave data:", error);
-                document.getElementById("loader").style.display = 'none';
-                document.getElementById("content").innerHTML = `<p>Failed to load seedwave data. Please try again later.</p>`;
+                document.getElementById("loading-container").innerHTML = "<p>Failed to load data.</p>";
             }
         }
 
@@ -159,8 +159,9 @@
             return 'purple';
         }
 
-        // Fetch data initially
+        // Fetch data initially and update every second
         fetchSeedwaveData();
+        setInterval(fetchSeedwaveData, 1000);
     </script>
 </body>
 </html>
