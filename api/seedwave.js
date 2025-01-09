@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 // File path for the seedwave storage
-const filePath = path.join(process.cwd(), 'seedwave.json');
+const filePath = path.join(process.cwd(), 'data', 'seedwave.json');
 
 // Function to generate a seedwave level with gradual weighted distribution
 function getWeightedSeedwaveLevel() {
