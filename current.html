@@ -178,14 +178,15 @@
         }
 
         function formatTime(timestamp, timezone) {
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                timeZone: timezone,
-            });
-        }
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZone: timezone,
+    });
+}
+
 
         function getLevelColorClass(level) {
             if (level <= 3) return 'green';
