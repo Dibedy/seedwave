@@ -92,11 +92,22 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
+
+        .made-by {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 14px;
+            color: #ffffff;
+            font-family: 'Lexend', sans-serif;
+        }
     </style>
 </head>
 <body>
+    <p class="made-by">Made by Dibedy</p>
+    
     <div class="container">
-        <h1>MAINTENANCE</h1>
+        <h1>Current Seedwave</h1>
         <div id="loading-circle" class="loading"></div>
         <p id="seedwave-level" style="display: none;">
             Seedwave Level: 
@@ -105,7 +116,7 @@
         <p id="ends-in" style="display: none;">Ends in: Loading...</p>
         <p id="next-seedwave" style="display: none;">Next Seedwave: Loading...</p>
         <p id="previous-seedwave" style="display: none;">Previous Seedwave: Loading...</p>
-        <a href="/index.html" class="button">Back</a>
+        <a href="/index.html" class="button">Back To Main</a>
     </div>
 
     <script>
