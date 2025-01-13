@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAINTENANCE</title>
+    <title>Seedwave</title>
     <style>
         /* General Reset */
         * {
@@ -81,7 +81,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>MAINTENANCE</h1>
+        <h1>MAINTAINENCE</h1>
         <p id="seedwave-level">
             Seedwave Level: 
             <span id="seedwave-number" class="green">Loading...</span>
@@ -89,7 +89,6 @@
         <p id="ends-in">Ends in: Loading...</p>
         <p id="next-seedwave">Next Seedwave: Loading...</p>
         <p id="previous-seedwave">Previous Seedwave: Loading...</p>
-        <a href="index.html" class="button">Back to Main Page</a>
     </div>
 
     <script>
@@ -107,7 +106,7 @@
                     `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
                 if (data.previousSeedwave.level !== 'N/A') {
                     document.getElementById("previous-seedwave").textContent = 
-                        `Previous Seedwave: Level ${data.previousSeedwave.level} (Ended at ${formatTime(data.previousSeedwave.endedAt, data.timezone)})`;
+                        `Previous Seedwave: Level ${data.previousSeedwave.level}`;
                 } else {
                     document.getElementById("previous-seedwave").textContent = 
                         "Previous Seedwave: N/A";
