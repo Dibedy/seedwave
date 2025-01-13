@@ -58,9 +58,9 @@ export default function handler(req, res) {
     let seedwaveData = readSeedwaveData();
     const now = Date.now();
 
-    // Set expiresAt to a past timestamp to simulate an expired seedwave
     if (!seedwaveData || now > seedwaveData.expiresAt) {
-        const previousSeedwave = seedwaveData
+        // Assign the correct previous seedwave level and expiration
+        const previousSeedwave = seedwaveData && seedwaveData.level
             ? {
                 level: seedwaveData.level,
                 endedAt: seedwaveData.expiresAt,
@@ -69,12 +69,13 @@ export default function handler(req, res) {
     
         seedwaveData = {
             level: getWeightedSeedwaveLevel(),
-            expiresAt: now + 0.2 * 60 * 1000, // Set a short duration (e.g., 10 minutes)
+            expiresAt: now + getRandomDuration(), // Normal random duration
             previousSeedwave,
         };
     
         writeSeedwaveData(seedwaveData);
     }
+    
     
 
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
