@@ -138,6 +138,13 @@
                 // Show the data and hide the loading circle
                 loadingCircle.style.display = "none";
                 seedwaveElements.forEach(el => el.style.display = "block");
+
+                // Update the "Ends in" countdown in real-time
+                setInterval(() => {
+                    document.getElementById("ends-in").textContent = 
+                        `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
+                }, 1000);
+
             } catch (error) {
                 console.error("Failed to fetch seedwave data:", error);
                 document.getElementById("seedwave-number").textContent = "Error";
