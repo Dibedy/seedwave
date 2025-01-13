@@ -109,6 +109,8 @@
     </div>
 
     <script>
+        let currentSeedwaveExpiresAt = null;
+
         async function fetchSeedwaveData() {
             const loadingCircle = document.getElementById("loading-circle");
             const seedwaveElements = document.querySelectorAll("#seedwave-level, #ends-in, #next-seedwave, #previous-seedwave");
@@ -135,15 +137,12 @@
                         "Previous Seedwave: N/A";
                 }
 
+                // Update the global expiresAt value
+                currentSeedwaveExpiresAt = data.expiresAt;
+
                 // Show the data and hide the loading circle
                 loadingCircle.style.display = "none";
                 seedwaveElements.forEach(el => el.style.display = "block");
-
-                // Update the "Ends in" countdown in real-time
-                setInterval(() => {
-                    document.getElementById("ends-in").textContent = 
-                        `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                }, 1000);
 
             } catch (error) {
                 console.error("Failed to fetch seedwave data:", error);
@@ -184,8 +183,22 @@
             return 'purple';
         }
 
-        // Fetch data initially
+        function checkSeedwaveExpiration() {
+            if (currentSeedwaveExpiresAt && Date.now() > currentSeedwaveExpiresAt) {
+                fetchSeedwaveData(); // Fetch new data when the current seedwave expires
+            }
+        }
+
+        // Fetch data initially and check for expiration every second
         fetchSeedwaveData();
+        setInterval(() => {
+            checkSeedwaveExpiration();
+
+            if (currentSeedwaveExpiresAt) {
+                document.getElementById("ends-in").textContent = 
+                    `Ends in: ${formatRemainingTime(currentSeedwaveExpiresAt - Date.now())}`;
+            }
+        }, 1000);
     </script>
 </body>
 </html>
