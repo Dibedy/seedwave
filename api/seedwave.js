@@ -23,13 +23,18 @@ function readSeedwaveData() {
     try {
         if (fs.existsSync(filePath)) {
             const data = fs.readFileSync(filePath, 'utf-8');
-            return JSON.parse(data);
+            const parsedData = JSON.parse(data);
+            if (!parsedData.previousSeedwave) {
+                parsedData.previousSeedwave = { level: 'N/A', endedAt: 'N/A' };
+            }
+            return parsedData;
         }
     } catch (error) {
         console.error('Error reading seedwave data:', error);
     }
     return null;
 }
+
 
 function writeSeedwaveData(data) {
     try {
@@ -60,7 +65,9 @@ export default function handler(req, res) {
     if (!seedwaveData || now > seedwaveData.expiresAt) {
         const previousSeedwave = seedwaveData && seedwaveData.level
             ? { level: seedwaveData.level, endedAt: seedwaveData.expiresAt }
-            : null;
+            : seedwaveData && seedwaveData.previousSeedwave
+            ? seedwaveData.previousSeedwave
+            : { level: 'N/A', endedAt: 'N/A' };
 
         seedwaveData = {
             level: getWeightedSeedwaveLevel(),
