@@ -40,7 +40,7 @@ function writeSeedwaveData(data) {
 }
 
 function isBloodseed() {
-    const chance = 0.05;
+    const chance = 1;
     return Math.random() < chance;
 }
 
