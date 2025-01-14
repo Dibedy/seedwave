@@ -101,6 +101,13 @@
             color: #ffffff;
             font-family: 'Lexend', sans-serif;
         }
+        #seedwave-number img {
+        vertical-align: middle; /* Aligns the image vertically with the text */
+        margin-left: 8px; /* Adds some space between the number and the image */
+        width: 20px; /* Sets the width of the image */
+        height: 20px; /* Sets the height of the image */
+        }
+
     </style>
 </head>
 <body>
@@ -120,7 +127,7 @@
     </div>
 
     <script>
-    async function fetchSeedwaveData() {
+   async function fetchSeedwaveData() {
     const loadingCircle = document.getElementById("loading-circle");
     const seedwaveElements = document.querySelectorAll("#seedwave-level, #ends-in, #next-seedwave, #previous-seedwave");
 
@@ -136,9 +143,15 @@
         seedwaveNumberElement.textContent = data.seedwave;
         seedwaveNumberElement.className = getLevelColorClass(data.seedwave);
 
-        // Add bloodseed emoji if applicable
+        // Add bloodseed image if applicable
         if (data.isBloodseed) {
-            seedwaveNumberElement.textContent += " 🩸"; // Add emoji
+            const bloodMoonImage = document.createElement('img');
+            bloodMoonImage.src = '/images/bloodmoon.png'; // Path to your image
+            bloodMoonImage.alt = 'Blood Moon';
+            bloodMoonImage.style.width = '20px'; // Adjust size as needed
+            bloodMoonImage.style.height = '20px';
+            bloodMoonImage.style.marginLeft = '8px'; // Add spacing
+            seedwaveNumberElement.appendChild(bloodMoonImage);
         }
 
         document.getElementById("ends-in").textContent = 
@@ -175,34 +188,6 @@
         seedwaveElements.forEach(el => el.style.display = "block");
     }
 }
-
-
-        function formatRemainingTime(milliseconds) {
-            const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            return `${hours}hr(s) ${minutes}min(s) ${seconds}sec(s)`;
-        }
-
-        function formatTimeWithTimezone(timestamp) {
-    const date = new Date(Number(timestamp)); 
-
-    const timeString = date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true,
-    });
-
-    const timezoneOffset = -date.getTimezoneOffset() / 60;
-    const timezoneString = `GMT${timezoneOffset >= 0 ? '+' : ''}${timezoneOffset}`;
-
-    return `${timeString} ${timezoneString}`;
-}
-
-
-
 
         function getLevelColorClass(level) {
             if (level <= 3) return 'green';
