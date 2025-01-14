@@ -1,10 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-// File path for the seedwave storage
 const filePath = path.join('/tmp', 'seedwave.json');
 
-// Function to generate a seedwave level with gradual weighted distribution
 function getWeightedSeedwaveLevel() {
     const weights = [5, 10, 20, 25, 20, 15, 5, 5, 3, 2];
     const cumulativeWeights = weights.map((sum => value => sum += value)(0));
@@ -12,17 +10,15 @@ function getWeightedSeedwaveLevel() {
     for (let i = 0; i < cumulativeWeights.length; i++) {
         if (random < cumulativeWeights[i]) return i + 1;
     }
-    return 1; // Fallback level
+    return 1;
 }
 
-// Function to generate a random duration between 25 minutes and 4 hours (in milliseconds)
 function getRandomDuration() {
     const min = 25 * 60 * 1000;
     const max = 4 * 60 * 60 * 1000;
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Function to read the current seedwave data from the file
 function readSeedwaveData() {
     try {
         if (fs.existsSync(filePath)) {
@@ -35,7 +31,6 @@ function readSeedwaveData() {
     return null;
 }
 
-// Function to write the current seedwave data to the file
 function writeSeedwaveData(data) {
     try {
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
@@ -44,9 +39,8 @@ function writeSeedwaveData(data) {
     }
 }
 
-// API handler
 function isBloodseed() {
-    const chance = 1; // 5% chance for a bloodseed
+    const chance = 0.05;
     return Math.random() < chance;
 }
 
@@ -71,7 +65,7 @@ export default function handler(req, res) {
         seedwaveData = {
             level: getWeightedSeedwaveLevel(),
             expiresAt: now + getRandomDuration(),
-            isBloodseed: isBloodseed(), // Add bloodseed indicator
+            isBloodseed: isBloodseed(),
             previousSeedwave,
         };
 

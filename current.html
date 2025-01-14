@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seedwave</title>
     <style>
-        /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -131,14 +130,12 @@
         }
         const data = await response.json();
 
-        // Update content with seedwave data
         const seedwaveNumberElement = document.getElementById("seedwave-number");
         seedwaveNumberElement.textContent = data.seedwave;
         seedwaveNumberElement.className = getLevelColorClass(data.seedwave);
 
-        // Add bloodseed emoji if applicable
         if (data.isBloodseed) {
-            seedwaveNumberElement.textContent += " 🩸"; // Add emoji
+            seedwaveNumberElement.textContent += " 🩸";
         }
 
         document.getElementById("ends-in").textContent = 
@@ -153,11 +150,9 @@
                 "Previous Seedwave: N/A";
         }
 
-        // Show the data and hide the loading circle
         loadingCircle.style.display = "none";
         seedwaveElements.forEach(el => el.style.display = "block");
 
-        // Update the "Ends in" countdown in real-time
         setInterval(() => {
             document.getElementById("ends-in").textContent = 
                 `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
@@ -170,7 +165,6 @@
         document.getElementById("next-seedwave").textContent = "Error";
         document.getElementById("previous-seedwave").textContent = "Error";
 
-        // Hide the loading circle and show error messages
         loadingCircle.style.display = "none";
         seedwaveElements.forEach(el => el.style.display = "block");
     }
@@ -201,9 +195,6 @@
     return `${timeString} ${timezoneString}`;
 }
 
-
-
-
         function getLevelColorClass(level) {
             if (level <= 3) return 'green';
             if (level <= 6) return 'yellow';
@@ -211,8 +202,6 @@
             if (level === 9) return 'red';
             return 'purple';
         }
-
-        // Fetch data initially
         fetchSeedwaveData();
     </script>
 </body>
