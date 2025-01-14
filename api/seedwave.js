@@ -46,7 +46,7 @@ function writeSeedwaveData(data) {
 
 // API handler
 function isBloodseed() {
-    const chance = 0.05; // 5% chance for a bloodseed
+    const chance = 1; // 5% chance for a bloodseed
     return Math.random() < chance;
 }
 
