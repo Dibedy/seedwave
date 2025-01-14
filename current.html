@@ -120,54 +120,62 @@
     </div>
 
     <script>
-        async function fetchSeedwaveData() {
-            const loadingCircle = document.getElementById("loading-circle");
-            const seedwaveElements = document.querySelectorAll("#seedwave-level, #ends-in, #next-seedwave, #previous-seedwave");
+    async function fetchSeedwaveData() {
+    const loadingCircle = document.getElementById("loading-circle");
+    const seedwaveElements = document.querySelectorAll("#seedwave-level, #ends-in, #next-seedwave, #previous-seedwave");
 
-            try {
-                const response = await fetch('/api/seedwave');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-
-                // Update content with seedwave data
-                document.getElementById("seedwave-number").textContent = data.seedwave;
-                document.getElementById("seedwave-number").className = getLevelColorClass(data.seedwave);
-                document.getElementById("ends-in").textContent = 
-                    `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                    document.getElementById("next-seedwave").textContent = 
-                    `Next Seedwave: ${formatTimeWithTimezone(data.expiresAt)}`;
-                if (data.previousSeedwave.level !== 'N/A') {
-                    document.getElementById("previous-seedwave").textContent = 
-                        `Previous Seedwave: Level ${data.previousSeedwave.level}`;
-                } else {
-                    document.getElementById("previous-seedwave").textContent = 
-                        "Previous Seedwave: N/A";
-                }
-
-                // Show the data and hide the loading circle
-                loadingCircle.style.display = "none";
-                seedwaveElements.forEach(el => el.style.display = "block");
-
-                // Update the "Ends in" countdown in real-time
-                setInterval(() => {
-                    document.getElementById("ends-in").textContent = 
-                        `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                }, 1000);
-
-            } catch (error) {
-                console.error("Failed to fetch seedwave data:", error);
-                document.getElementById("seedwave-number").textContent = "Error";
-                document.getElementById("ends-in").textContent = "Error";
-                document.getElementById("next-seedwave").textContent = "Error";
-                document.getElementById("previous-seedwave").textContent = "Error";
-
-                // Hide the loading circle and show error messages
-                loadingCircle.style.display = "none";
-                seedwaveElements.forEach(el => el.style.display = "block");
-            }
+    try {
+        const response = await fetch('/api/seedwave');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        const data = await response.json();
+
+        // Update content with seedwave data
+        const seedwaveNumberElement = document.getElementById("seedwave-number");
+        seedwaveNumberElement.textContent = data.seedwave;
+        seedwaveNumberElement.className = getLevelColorClass(data.seedwave);
+
+        // Add bloodseed emoji if applicable
+        if (data.isBloodseed) {
+            seedwaveNumberElement.textContent += " 🩸"; // Add emoji
+        }
+
+        document.getElementById("ends-in").textContent = 
+            `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
+        document.getElementById("next-seedwave").textContent = 
+            `Next Seedwave: ${formatTimeWithTimezone(data.expiresAt)}`;
+        if (data.previousSeedwave.level !== 'N/A') {
+            document.getElementById("previous-seedwave").textContent = 
+                `Previous Seedwave: Level ${data.previousSeedwave.level}`;
+        } else {
+            document.getElementById("previous-seedwave").textContent = 
+                "Previous Seedwave: N/A";
+        }
+
+        // Show the data and hide the loading circle
+        loadingCircle.style.display = "none";
+        seedwaveElements.forEach(el => el.style.display = "block");
+
+        // Update the "Ends in" countdown in real-time
+        setInterval(() => {
+            document.getElementById("ends-in").textContent = 
+                `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
+        }, 1000);
+
+    } catch (error) {
+        console.error("Failed to fetch seedwave data:", error);
+        document.getElementById("seedwave-number").textContent = "Error";
+        document.getElementById("ends-in").textContent = "Error";
+        document.getElementById("next-seedwave").textContent = "Error";
+        document.getElementById("previous-seedwave").textContent = "Error";
+
+        // Hide the loading circle and show error messages
+        loadingCircle.style.display = "none";
+        seedwaveElements.forEach(el => el.style.display = "block");
+    }
+}
+
 
         function formatRemainingTime(milliseconds) {
             const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));

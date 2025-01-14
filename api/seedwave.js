@@ -45,6 +45,11 @@ function writeSeedwaveData(data) {
 }
 
 // API handler
+function isBloodseed() {
+    const chance = 0.05; // 5% chance for a bloodseed
+    return Math.random() < chance;
+}
+
 export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -59,30 +64,26 @@ export default function handler(req, res) {
     const now = Date.now();
 
     if (!seedwaveData || now > seedwaveData.expiresAt) {
-        // Assign the correct previous seedwave level and expiration
         const previousSeedwave = seedwaveData && seedwaveData.level
-            ? {
-                level: seedwaveData.level,
-                endedAt: seedwaveData.expiresAt,
-            }
+            ? { level: seedwaveData.level, endedAt: seedwaveData.expiresAt }
             : null;
-    
+
         seedwaveData = {
             level: getWeightedSeedwaveLevel(),
-            expiresAt: now + getRandomDuration(), // Normal random duration
+            expiresAt: now + getRandomDuration(),
+            isBloodseed: isBloodseed(), // Add bloodseed indicator
             previousSeedwave,
         };
-    
+
         writeSeedwaveData(seedwaveData);
     }
-    
-    
 
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
     res.status(200).json({
         seedwave: seedwaveData.level,
         expiresAt: seedwaveData.expiresAt,
+        isBloodseed: seedwaveData.isBloodseed || false,
         previousSeedwave: seedwaveData.previousSeedwave || { level: 'N/A', endedAt: 'N/A' },
         timezone: userTimezone,
     });
