@@ -136,8 +136,8 @@
                 document.getElementById("seedwave-number").className = getLevelColorClass(data.seedwave);
                 document.getElementById("ends-in").textContent = 
                     `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
-                document.getElementById("next-seedwave").textContent = 
-                    `Next Seedwave: ${formatTime(data.expiresAt, data.timezone)}`;
+                    document.getElementById("next-seedwave").textContent = 
+                    `Next Seedwave: ${formatTimeWithTimezone(data.expiresAt)}`;
                 if (data.previousSeedwave.level !== 'N/A') {
                     document.getElementById("previous-seedwave").textContent = 
                         `Previous Seedwave: Level ${data.previousSeedwave.level}`;
@@ -177,15 +177,23 @@
             return `${hours}hr(s) ${minutes}min(s) ${seconds}sec(s)`;
         }
 
-        function formatTime(timestamp, timezone) {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
+        function formatTimeWithTimezone(timestamp) {
+    const date = new Date(Number(timestamp)); 
+
+    const timeString = date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        timeZone: timezone,
+        hour12: true,
     });
+
+    const timezoneOffset = -date.getTimezoneOffset() / 60;
+    const timezoneString = `GMT${timezoneOffset >= 0 ? '+' : ''}${timezoneOffset}`;
+
+    return `${timeString} ${timezoneString}`;
 }
+
+
 
 
         function getLevelColorClass(level) {
