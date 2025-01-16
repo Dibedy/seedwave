@@ -4,7 +4,7 @@ import path from 'path';
 const filePath = path.join('/tmp', 'seedwave.json');
 
 function getWeightedSeedwaveLevel() {
-    const weights = [5, 10, 20, 25, 20, 15, 5, 5, 3, 2];
+    const weights = [4, 5, 10, 15, 15, 15, 20, 8, 5, 3];
     const cumulativeWeights = weights.map((sum => value => sum += value)(0));
     const random = Math.random() * 100;
     for (let i = 0; i < cumulativeWeights.length; i++) {
