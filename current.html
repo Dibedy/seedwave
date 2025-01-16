@@ -114,14 +114,13 @@
         </p>
         <p id="ends-in" style="display: none;">Ends in: Loading...</p>
         <p id="next-seedwave" style="display: none;">Next Seedwave: Loading...</p>
-        <p id="previous-seedwave" style="display: none;">Previous Seedwave: Loading...</p>
         <a href="/index.html" class="button">Back To Main</a>
     </div>
 
     <script>
     async function fetchSeedwaveData() {
     const loadingCircle = document.getElementById("loading-circle");
-    const seedwaveElements = document.querySelectorAll("#seedwave-level, #ends-in, #next-seedwave, #previous-seedwave");
+    const seedwaveElements = document.querySelectorAll("#seedwave-level, #ends-in, #next-seedwave");
 
     try {
         const response = await fetch('/api/seedwave');
@@ -142,13 +141,6 @@
             `Ends in: ${formatRemainingTime(data.expiresAt - Date.now())}`;
         document.getElementById("next-seedwave").textContent = 
             `Next Seedwave: ${formatTimeWithTimezone(data.expiresAt)}`;
-        if (data.previousSeedwave.level !== 'N/A') {
-            document.getElementById("previous-seedwave").textContent = 
-                `Previous Seedwave: Level ${data.previousSeedwave.level}`;
-        } else {
-            document.getElementById("previous-seedwave").textContent = 
-                "Previous Seedwave: N/A";
-        }
 
         loadingCircle.style.display = "none";
         seedwaveElements.forEach(el => el.style.display = "block");
